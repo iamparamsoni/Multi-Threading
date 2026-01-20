@@ -1,0 +1,206 @@
+The most crucial reason for multithreading is to separate multiple tasks that might be subject to interference by the execution of other tasks.
+
+Multithreading is the ability of the CPU to execute multiple processes or threads concurrently.
+Both threads and processes are independent sequences of execution.
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+**Process is an instance of a program execution. It is a fundamental unit of work in our OS.
+For example when you open a software or web browser - these are distinct processes.
+The OS assigns distinct registers, stack memory, and heap memory to every single process.
+
+In java we can create processes with the ProcessBuilder class.
+Every single process has a so called parent process.
+If we create a process then we should also handle the parent process as well.
+
+**Threads is essentially light-weight process.
+It is a unit of execution within a given process, so a single process may contain several threads.
+Each thread in a process shares the memory and resources and this is why programmers have to deal with concurrent programming.
+Creating new threads require fewer resources than creating new processes. Also we don't have to deal with the parent process in case of threads.
+We don't have to allocate new registers,so that is why threads are co called lightweight processes.
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Somehow the single CPU has to deal with all the k threads in the application - one approach is to use the time-slicing algorithm.
+Processing time for a single processor is shared among multiple processes or threads.
+
+    (a) Single CPU :
+                        ===   ===   ===         Thread #1
+                           ===   ===   ===      Thread #2
+
+        This is time-slicing algorithm when the single processor handles thread #1 for a short amount of time and then
+        thread #2 and so on...
+
+    (b) Multiple Processors :
+
+                        ========================    Thread #1 (on CPU #1)
+                        ========================    Thread #2 (on CPU #2)
+
+        When there are multiple processors or core then all the threads can be executed in a parallel manner !
+        OS is going to assign a distinct thread to every single CPU
+        In case of multiple CPU , all the threads are executed at same time which is called parallelization
+        If there are multiple threads, then the number of processors, then time slicing algorithm is considered
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Threads are manipulating data that are located on the same memory area because they belong to the same process-synchronization is not straight-forward.
+Data becomes inconsistent if multiple threads are manipulating at the same time.
+It is not easy to design and test multithreaded applications.
+Using multiple threads is expensive - CPU has to save local data,application pointer etc. of the current thread and has to load the other thread as well.
+It is expensive to switch between multiple threads this is why an algorithm may become too slow with multiple-threads.
+
+**Rule of Thumb : For small problems and applications it is unnecessary to use multiple threads.
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+**Thread Lifecycle :
+    (a) New = Every thread is in the new state until we call the start() method
+    (b) Active = When we call start() method on the given thread.
+                 There are two sub-states : Runnable and Running
+                 Runnable : Can be executed by the CPU but noty handles at the moment because another thread is executed by CPU.
+                 Running : CPU runs the thread.
+    (c) Blocked = When we call the join() method or when a thread is waiting for another thread to finish.
+                  In this state, thread doesn't need any CPU cycles.
+                  Thread scheduler is going to notify this thread that it can continue with the execution of given task.
+    (d) Terminated = When a thread has finished it's task.
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+**Thread Manipulation
+
+If you want to execute multiple threads then use Runnable Functional Interface.
+The Runnable interface should be implemented by any class whose instances are intended to be executed by a thread.
+The class must define a method of no arguments called run.
+This interface is designed to provide a common protocol for objects that wish to execute code while they are active.
+For example, Runnable is implemented by class Thread. Being active simply means that a thread has been started and has not yet been stopped.
+In addition, Runnable provides the means for a class to be active while not subclassing Thread.
+A class that implements Runnable can run without subclassing Thread by instantiating a Thread instance and passing itself in as the target.
+In most cases, the Runnable interface should be used if you are only planning to override the run() method and no other Thread methods.
+This is important because classes should not be subclassed unless the programmer intends on modifying or enhancing the fundamental behavior of the class.
+
+#Note -     1. Runnable defines the task, Thread executes the task.
+            2. Runnable is not itself a Thread but Thread calls Runnable run()
+            3. A Runnable object is passed to a Thread instance and that instance can start the new thread by start() method.
+
+To modify or manipulate Thread behaviour, then use Thread class.
+A thread is a thread of execution in a program. The Java Virtual Machine allows an application to have multiple threads of execution running concurrently.
+Every thread has a priority. Threads with higher priority are executed in preference to threads with lower priority. Each thread may or may not also be marked as a daemon.
+When code running in some thread creates a new Thread object, the new thread has its priority initially set equal to the priority of the creating thread, and is a daemon thread if and only if the creating thread is a daemon.
+
+InterruptedException = Thrown when a thread is waiting, sleeping, or otherwise occupied, and the thread is interrupted, either before or during the activity.
+It is a checked exception.
+The interrupt mechanism is implemented using a flag known as the interrupt status. Each thread has a boolean property that represents its interrupted status.
+Invoking Thread.interrupt() sets this flag.
+When a thread checks for an interrupt by invoking the static method Thread.interrupted(), the interrupt status is cleared.
+Thread provides the interrupt() method for interrupting a thread, and to query whether a thread has been interrupted, we can use the isInterrupted() method.
+isInterrupted() is an instance method which doesn't clear the flag.
+Thread.interrupted() is a static method which clears the flag.
+
+The main thread is the initial thread that starts automatically when your Java program begins execution.
+It is responsible for executing the code in the main(String[] args) method.
+The main thread continues immediately, it doesn't pause or wait for the new thread.
+We can start the new threads from the main method.
+
+
+    Main Thread
+        |
+        |
+        |--------- Runner #1 ----- Runner #2----
+        |               |               |
+        |               |               |
+        |               |               |
+        |---------------------------------------        Join Point
+        |
+
+java.lang.Thread class provides the join() method which allows one thread to wait until another thread completes its execution.
+When we invoke the join() method on a thread, the calling thread goes into a waiting state. It remains in a waiting state until the referenced thread terminates.
+If t is a Thread object whose thread is currently executing, then t.join() will make sure that t is terminated before the next instruction is executed by the program.
+
+public final void join() throws InterruptedException
+Waits for this thread to die.
+An invocation of this method behaves in exactly the same way as the invocation of join(0) i.e. join(0) = join()
+
+On a single-core CPU, multithreading is not faster. It might even be slower due to context switching.
+Context switching is when a CPU stops executing one task or thread and switches to another.
+Multithreading helps utilize idle CPU time, especialy in I/O - bound programs.
+
+Types of Threads :
+
+    1. User Threads = Lightweight subprocess, the smallest unit of processing.It is used for any main or regular task.
+                      Generally created by the extending Thread class or implementing Runnable functional interface.
+                      They are typically created (directly or indirectly) from the main thread.
+
+    2. Worker Threads = User-defined threads that perform specific tasks,often in a thread pool which allows multiple tasks to run in parallel.
+                        We can create a predefined number of threads, and with help of that threads we can execute specific tasks usually in parallel.
+                        The worker threads are usually handles by executor services.
+                        Worker threads are typically created (directly or indirectly) from the main thread.
+                        Web server handling client request, each request us processed by a worker thread form a thread pool.
+
+                        eg - var executor = Executors.newFixedThreadPool(5);
+                             executor.submit(() -> {
+                                System.out.println("Worker Thread Task");
+                             });
+                             executor.shutdown();
+
+
+    3. Daemon Threads = It is a background thread that runs in support of user threads. It does not prevent JVM from exiting once all user thread finish.
+                        Java's Timer uses a daemon thread by default.
+                        Background monitoring tasks to monitor application state, memory logs, etc.
+                        Act as a background service threads
+
+                        eg - Thread t = new Thread(() -> {
+                            while(true){
+                                System.out.println("Daemon running");
+                                try{
+                                    Thread.sleep(1000);
+                                }
+                                catch(InterruptedException e){
+                                    System.out.println("Error);
+                                }
+                            }
+                            });
+                            t.setDaemon(true);
+                            t.start();
+
+Suppose a process has 5 threads but,
+A single central processing unit can execute just a single thread at a given time.
+Thread scheduler came in picture for this and is a part of JVM that decides what thread will be executed by the CPU.
+Time slicing algorithm is handled by the thread scheduler.
+To decide order of threads we have thread priority and assign a priority value(1-10) to every thread :
+    1: MIN_PRIORITY
+    5: DEFAULT_PRIORITY
+    10: MAX_PRIORITY
+Threads with same priority value are executed in a FIFS (first-in-first-served manner) - the thread scheduler store the threads in a queue.
+Higher priority threads are executed before lower priority threads but it depends on the underlying OS (thread starvation is avoided)
+Types of Thread Priority : Max, Min and Normal.
+
+We don't have full control over the thread priorities, it fully depends on the underlying OS.
+Many modern OS use time sharing or so-called preemptive multilevel queue schedulers, which may not respect Java level priority consistently.
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+**Inter-Thread Communication
+Processes run in separate memory space so we don't have to deal with synchronization, which makes it quite easy for concurrency.
+Threads are faster as they are light weight processes and threads of the same process run in a shared memory space.
+
+Stack Memory : 1. Stores method calls, local variables, and reference variables.
+               2. Smaller in size but faster to access.
+               3. Exists for the lifetime of a method call + automatically managed.
+               4. Every thread has its own stack.
+
+Heap Memory : 1. Stores objects and instance variables.
+              2. Larger in size but slower to access.
+              3. Objects exist until they are garbage collected + dynamically allocated.
+              4. Shared Between Threads.
+
+#Note : Garbage collection is associated with Heap memory explicitly.
+
+#Shared Memory Space = **Every Thread has it own stack memory but all threads share heap memory**
+
+The main purpose of synchronization is to allow safe sharing of resources between threads by preventing interference through mutual exclusion.
+
+       ___________
+       | Main    |
+       | Memory  |  <-----> |Cache| |Stack| - Thread #1
+       | (Ram)   |  <-----> |Cache| |Stack| - Thread #2
+       |_________|
