@@ -204,3 +204,8 @@ The main purpose of synchronization is to allow safe sharing of resources betwee
        | Memory  |  <-----> |Cache| |Stack| - Thread #1
        | (Ram)   |  <-----> |Cache| |Stack| - Thread #2
        |_________|
+
+#Note = Incrementing an integer is not an atomic process
+
+Thread safety in java is the process to make our program safe to use in a multithreaded environment.
+Synchronization is the easiest tool for thread safety in java.
