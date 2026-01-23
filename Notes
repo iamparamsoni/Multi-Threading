@@ -209,3 +209,24 @@ The main purpose of synchronization is to allow safe sharing of resources betwee
 
 Thread safety in java is the process to make our program safe to use in a multithreaded environment.
 Synchronization is the easiest tool for thread safety in java.
+
+Every object in java has a so-called intrinsic lock aka monitor lock associated with it.
+It is a built-in mechanism that java provides for synchronization.
+When you use the synchronized keyword on instance method or blocks, the thread tries to acquire the intrinsic lock of the specific object(this) before entering in the critical section.
+Only one thread can hold this lock at a time, other thread trying to acquire it must wait.
+
+#Problem with synchronization :
+    1. Every object in java has exactly one intrinsic lock(monitor) associated with it !
+    2. When you declare multiple synchronized instance methods in a class, all of them compete for the same single lock - the object's monitor.
+    3. If thread 1 holds that lock executing method1(), thread 2 trying to enter method2() on the same object must wait, even if method1() and method2() are logically independent.
+
+#Synchronized Block = 1. Instead of synchronizing an entire method, Java allows synchronization on specific blocks of code.
+        2. This improves performance by locking only the necessary section.
+        3. A synchronized block allows you to lock only a specific section of code instead of an entire method.
+        4. It allows multiple synchronized block to operate independently if they are locked on different object.
+        e.g. : method1(){
+                    synchronized(this){
+                        //This is the synchronization block
+                    }
+                }
+
